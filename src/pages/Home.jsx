@@ -1,33 +1,20 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { Link, useLocation } from "react-router-dom";
 import Task from "../components/Task";
 import Nav from "../components/Nav";
 import AddTaskModal from "../modals/AddTaskModal";
 import instance from "../apis/apisconfig";
 
 export default function Home() {
+  const User_id = localStorage.getItem("userId");
+  const currentDate = new Date().toISOString().slice(0, 10);
   const [addTask, setAddTask] = useState(false);
   const [todoTask, setTodoTask] = useState([]);
   const [processTask, setProcessTask] = useState([]);
   const [doneTask, setDoneTask] = useState([]);
-  const [taskForm, setTaskForm] = useState({
-    title: "",
-    description: "",
-    start: "",
-    end: "",
-  });
-
-  const handleTaskFormChange = (e) => {
-    const { name, value } = e.target;
-    setTaskForm((prevForm) => ({
-      ...prevForm,
-      [name]: value,
-    }));
-  };
   const getTask = () => {
     instance
-      .get("user/4/task")
+      .get(`user/${User_id}/task/by_date_start?start_date=${currentDate}`)
       .then((res) => {
         const tasklist = res.data.data;
         setTodoTask(tasklist.filter((task) => task.status === "todo"));
@@ -93,11 +80,7 @@ export default function Home() {
         </div>
       </div>
       {addTask && (
-        <AddTaskModal
-          taskForm={taskForm}
-          onChange={handleTaskFormChange}
-          onClose={() => setAddTask(false)}
-        />
+        <AddTaskModal userId={User_id} onClose={() => setAddTask(false)} />
       )}
     </MainLayout>
   );

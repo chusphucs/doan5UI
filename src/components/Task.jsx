@@ -3,7 +3,7 @@ import React from "react";
 export default function Task({ task }) {
   return (
     <div className="w-full py-2 flex justify-between items-center">
-      <p>{task}</p>
+      <p>{task.title}</p>
       <div className="flex gap-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"

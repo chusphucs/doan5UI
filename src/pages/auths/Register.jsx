@@ -4,9 +4,7 @@ import { schema } from "../../utils/validate";
 import instance from "../../apis/apisconfig";
 import toast from "react-hot-toast";
 export default function Register() {
-  // const navigate = useNavigate();
   const navigate = useNavigate();
-
   const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({

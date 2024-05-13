@@ -1,59 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MainLayout from "../../layouts/MainLayout";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import instance from "../../apis/apisconfig";
 import toast from "react-hot-toast";
 
-export default function UserUpdate() {
+export default function UserChangePass() {
+  const navigate = useNavigate();
   const user_Id = localStorage.getItem("userId");
+
   const location = useLocation();
-  const [userInfo, setUserInfo] = useState({});
   const isActive = (targetPath) => {
     return location.pathname === targetPath;
   };
   const [formData, setFormData] = useState({
-    name: "",
-    password: "",
+    current_password: "",
+    new_password: "",
   });
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      const response = await instance.post(`user/${user_Id}/edit`, formData);
-
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error:", error.response.data.message);
-      setErrorMessage(error.response.data.message);
-    }
-  };
-
-  const getUserInfo = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     instance
-      .get(`user/${user_Id}/info`)
+      .post(`user/${user_Id}/info/updatePassword`, formData)
       .then((res) => {
         if (res.data.status_code === 200) {
-          setUserInfo(res.data.data);
-          console.log(res.data.data);
+          toast.success(res.data.message);
+          localStorage.removeItem("isLogin");
+          localStorage.removeItem("userId");
+          navigate("/login");
         } else {
           toast.error(res.data.message);
         }
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+
   return (
     <div className="">
       <MainLayout>
@@ -121,7 +106,9 @@ export default function UserUpdate() {
           <div className="md:grid md:col-span-4 grid col-span-5">
             <div className="flex flex-col">
               <div className="flex items-center px-12 pt-10 pb-1">
-                <h1 className="text-3xl font-bold mr-8">Update your profile</h1>
+                <h1 className="text-3xl font-bold mr-8">
+                  Update your password
+                </h1>
               </div>
 
               <div className="pt-6 px-4 flex">
@@ -139,7 +126,7 @@ export default function UserUpdate() {
                   to={"/user/changepass"}
                   className={`px-4 py-2 flex gap-1 items-center ${
                     isActive("/user/changepass")
-                      ? "text-blue-900 px-2  font-bold underline"
+                      ? "text-blue-900 px-2 font-bold underline"
                       : ""
                   }`}
                 >
@@ -152,16 +139,17 @@ export default function UserUpdate() {
                   <div className="mb-2">
                     <label
                       className="mb-2 block text-sm font-bold text-gray-700"
-                      htmlFor="email"
+                      htmlFor="password"
                     >
-                      New Name
+                      Current Password
                     </label>
                     <input
-                      type="text"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none "
-                      name="name"
-                      value={formData.name}
+                      type="password"
+                      name="current_password"
+                      value={formData.current_password}
                       onChange={handleChange}
+                      className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                      required
                     />
                   </div>
                   <div className="mb-2">
@@ -169,22 +157,25 @@ export default function UserUpdate() {
                       className="mb-2 block text-sm font-bold text-gray-700"
                       htmlFor="password"
                     >
-                      Confirm Password
+                      New password
                     </label>
                     <input
                       type="password"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-                      name="password"
-                      value={formData.password}
+                      name="new_password"
+                      value={formData.new_password}
                       onChange={handleChange}
+                      required
+                      minLength={6}
+                      className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
                     />
                   </div>
+
                   <div className="flex items-center">
                     <button
                       type="submit"
                       className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-600 focus:outline-none"
                     >
-                      Save
+                      Xác nhận
                     </button>
                   </div>
                 </form>

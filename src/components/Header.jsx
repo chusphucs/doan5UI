@@ -1,18 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Container from "./Container";
-import avatar from "../assets/avatar.jpg";
+import instance from "../apis/apisconfig";
 
 export default function Header() {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
+  const user_id = localStorage.getItem("userId");
   const [isLogin, setIsLogin] = useState(true);
+  const [firstName, setFirstName] = useState("");
   const navigate = useNavigate();
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
-
+  const getUserInfo = () => {
+    instance
+      .get(`user/${user_id}/info`)
+      .then((res) => setFirstName(res.data.data.name.charAt(0).toUpperCase()))
+      .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    getUserInfo();
+  }, [user_id]);
   return (
     <div className="w-full bg-white relative ">
       <Container>
@@ -32,21 +42,29 @@ export default function Header() {
           <div className=" relative flex items-center">
             {isLogin ? (
               <div className=" flex items-center gap-4 pr-4">
-                <img
-                  src={avatar}
-                  alt="avatar"
+                <div
+                  className="h-6 w-6 rounded-full cursor-pointer flex justify-center items-center bg-gray-300 text-gray-700"
                   onClick={() => {
                     setUserMenu(!userMenu);
                   }}
-                  className="h-6 w-6 rounded-full cursor-pointer"
-                />
+                >
+                  {firstName}
+                </div>
                 {userMenu ? (
                   <ul className="absolute top-10 bg-gray-300 w-24 pl-1 h-16 pt-1 z-30">
                     <li>
                       <Link to={"/user/update"}>Edit Profile</Link>
                     </li>
                     <li>
-                      <Link to={"/login"}>Logout</Link>
+                      <Link
+                        onClick={() => {
+                          localStorage.removeItem("isLogin");
+                          localStorage.removeItem("userId");
+                        }}
+                        to={"/login"}
+                      >
+                        Logout
+                      </Link>
                     </li>
                   </ul>
                 ) : (

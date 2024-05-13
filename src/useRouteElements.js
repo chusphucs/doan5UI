@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import UserUpdate from "./pages/auths/UserUpdate";
 import Upcoming from "./pages/Upcoming";
 import TeamPage from "./pages/TeamPage";
+import UserChangePass from "./pages/auths/UserChangePass";
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -33,6 +34,10 @@ export default function useRouteElements() {
     {
       path: "/teams/:id",
       element: <TeamPage />,
+    },
+    {
+      path: "/user/changepass",
+      element: <UserChangePass />,
     },
   ]);
   return routeElements;

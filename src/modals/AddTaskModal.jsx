@@ -1,8 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import instance from "../apis/apisconfig";
+import toast from "react-hot-toast";
 
-const AddTaskModal = ({ userId, onClose }) => {
+const AddTaskModal = ({ userId, onClose, refreshTasks }) => {
   const [formData, setFormData] = useState({
     title: "",
     day_start: "",
@@ -45,19 +46,20 @@ const AddTaskModal = ({ userId, onClose }) => {
       day_expire: formatDateTime(formData.day_expire),
     };
     console.log(formattedData);
-    // try {
-    //   const response = await instance.post(
-    //     `user/${userId}/task/create`,
-    //     formData
-    //   );
-    //   if (response.status === 200) {
-    //     console.log("Task created successfully!");
-    //     // Thực hiện các hành động khác sau khi tạo task thành công nếu cần
-    //   }
-    // } catch (error) {
-    //   console.log("Error creating task:", error);
-    //   // Xử lí lỗi nếu có
-    // }
+    try {
+      const response = await instance.post(
+        `user/${userId}/task/create`,
+        formattedData
+      );
+      if (response.status === 200) {
+        toast.success("Task created successfully!");
+        onClose();
+        refreshTasks();
+      }
+    } catch (error) {
+      console.log("Error creating task:", error);
+      // Xử lí lỗi nếu có
+    }
   };
 
   return (

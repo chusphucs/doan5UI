@@ -39,38 +39,38 @@ export default function Home() {
           <div className="flex flex-col">
             <div className="flex items-center px-12 pt-10 pb-1">
               <h1 className="text-3xl font-bold mr-8">Today</h1>
-              <p className="">3 May</p>
+              <p className="">{currentDate}</p>
             </div>
-            <div className="md:grid md:grid-cols-3 flex flex-col gap-10 pl-10 md:pl-32 pt-4">
-              <div className="col-span-1 flex flex-col md:max-w-[80%] max-w-[90%] border-[1px] border-gray-300 shadow-lg p-4">
+            <div className="md:grid md:grid-cols-3 flex flex-col gap-10 p-4 md:pl-10 ">
+              <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4 ">
                 <b className="mb-4 border-b-[1px] border-gray-300">To do</b>
                 {todoTask.map((task) => {
                   return (
                     <div key={task.id}>
-                      <Task task={task} />
+                      <Task task={task} refreshTasks={getTask} />
                     </div>
                   );
                 })}
                 <button onClick={() => setAddTask(true)}>+ Add task</button>
               </div>
-              <div className="col-span-1 flex flex-col md:max-w-[80%] max-w-[90%] border-[1px] border-gray-300 shadow-lg p-4">
+              <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
                 <b className="mb-4 border-b-[1px] border-gray-300">
                   In Process
                 </b>
                 {processTask.map((task) => {
                   return (
                     <div key={task.id}>
-                      <Task task={task} />
+                      <Task task={task} refreshTasks={getTask} />
                     </div>
                   );
                 })}
               </div>
-              <div className="col-span-1 flex flex-col md:max-w-[80%] max-w-[90%] border-[1px] border-gray-300 shadow-lg p-4">
+              <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
                 <b className="mb-4 border-b-[1px] border-gray-300">Done</b>
                 {doneTask.map((task) => {
                   return (
                     <div key={task.id}>
-                      <Task task={task} />
+                      <Task task={task} refreshTasks={getTask} />
                     </div>
                   );
                 })}
@@ -80,7 +80,11 @@ export default function Home() {
         </div>
       </div>
       {addTask && (
-        <AddTaskModal userId={User_id} onClose={() => setAddTask(false)} />
+        <AddTaskModal
+          userId={User_id}
+          onClose={() => setAddTask(false)}
+          refreshTasks={getTask}
+        />
       )}
     </MainLayout>
   );

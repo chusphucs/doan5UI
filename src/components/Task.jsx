@@ -1,17 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
+import instance from "../apis/apisconfig";
+import toast from "react-hot-toast";
+import TaskDescription from "../modals/TaskDescriptionModal";
 
-export default function Task({ task }) {
+export default function Task({ task, refreshTasks }) {
+  const [showDescription, setShowDescription] = useState(false);
+  const handleChangeStatus = () => {
+    instance
+      .put(`user/${task.user_id}/task/${task.id}/edit_status`, {
+        status: task.status,
+      })
+      .then((res) => {
+        console.log(res);
+        refreshTasks();
+      })
+      .catch((err) => console.log(err));
+  };
+  const handleDeleteTask = () => {
+    console.log(task);
+    instance
+      .delete(`user/${task.user_id}/task/${task.id}/delete`)
+      .then((res) => {
+        if (res.status === 200) {
+          refreshTasks();
+          toast.success("Xóa thành công!");
+        } else {
+          toast.error(res.message);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div className="w-full py-2 flex justify-between items-center">
-      <p>{task.title}</p>
-      <div className="flex gap-1">
+      <p
+        className={`cursor-pointer ${
+          task.status === "todo"
+            ? "text-blue-700"
+            : task.status === "process"
+            ? "text-orange-400"
+            : "text-black"
+        }`}
+        onClick={() => setShowDescription(true)}
+      >
+        {task.title}
+      </p>
+      <div className="flex gap-2 items-center">
+        {task.status !== "done" && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={0.5}
+            stroke="currentColor"
+            className="w-5 h-5 cursor-pointer hover:fill-green-300"
+            onClick={handleChangeStatus}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        )}
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
+          ß
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-4 h-4"
+          className="w-4 h-4 cursor-pointer"
         >
           <path
             strokeLinecap="round"
@@ -21,11 +80,12 @@ export default function Task({ task }) {
         </svg>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          fill="none"
+          fill="#f05959"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-4 h-4"
+          className="w-4 h-4 cursor-pointer"
+          onClick={handleDeleteTask}
         >
           <path
             strokeLinecap="round"
@@ -34,6 +94,12 @@ export default function Task({ task }) {
           />
         </svg>
       </div>
+      {showDescription && (
+        <TaskDescription
+          task={task}
+          onClose={() => setShowDescription(false)}
+        />
+      )}
     </div>
   );
 }

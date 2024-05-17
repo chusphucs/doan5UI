@@ -32,7 +32,7 @@ export default function useRouteElements() {
       element: <Upcoming />,
     },
     {
-      path: "/teams/:id",
+      path: "/teams/:teamId/:teamName",
       element: <TeamPage />,
     },
     {

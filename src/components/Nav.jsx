@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import AddNewTeam from "../modals/AddNewTeam";
+import instance from "../apis/apisconfig";
 
 export default function Nav() {
   const location = useLocation();
+  const userId = localStorage.getItem("userId");
   const [showNav, setShowNav] = useState(false);
+  const [addTeam, setAddTeam] = useState(false);
+  const [teams, setTeams] = useState([]);
 
   const isActive = (targetPath) => {
     return location.pathname === targetPath;
   };
+
+  const getTeams = () => {
+    instance
+      .get(`user/${userId}/teams`)
+      .then((res) => {
+        if (res.data.status_code === 200) {
+          setTeams(res.data.data);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    getTeams();
+  }, []);
+
   return (
     <div className="relative">
       <div className="absolute top-4 left-4 md:hidden flex">
@@ -87,14 +107,33 @@ export default function Nav() {
           </Link>
         </div>
         <div>
-          <p className="font-bold  p-4">My teams</p>
+          <p className="font-bold mt-6 p-4">My teams</p>
           <hr className="border-gray-300 border-b-[1px]" />
-          <Link to={"/teams/38124345434"}># teamname</Link>
+          <div className="flex flex-col gap-2 p-4">
+            {teams &&
+              teams.map((team) => {
+                return (
+                  <Link key={team.id} to={`/teams/${team.id}/${team.name}`}>
+                    # {team.name}
+                  </Link>
+                );
+              })}
+          </div>
         </div>
-        <div className="absolute bottom-6 right-10">
+        <div
+          className="absolute bottom-6 right-10 cursor-pointer"
+          onClick={() => setAddTeam(true)}
+        >
           <p className="font-bold">+ Add new team</p>
         </div>
       </div>
+      {addTeam && (
+        <AddNewTeam
+          userId={userId}
+          onClose={() => setAddTeam(false)}
+          refreshTeams={getTeams}
+        />
+      )}
     </div>
   );
 }

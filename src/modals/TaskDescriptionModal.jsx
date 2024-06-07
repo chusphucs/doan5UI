@@ -1,6 +1,7 @@
 import React from "react";
 
 const TaskDescription = ({ task, onClose }) => {
+  console.log(task);
   const handleClose = (event) => {
     if (event.target === event.currentTarget) {
       onClose();
@@ -13,7 +14,6 @@ const TaskDescription = ({ task, onClose }) => {
   const startDateString = startDate.toISOString().split("T")[0];
   const startTimeString = startDate.toTimeString().split(" ")[0].slice(0, 5);
   const endTimeString = endDate.toTimeString().split(" ")[0].slice(0, 5);
-  console.log(task);
 
   return (
     <div

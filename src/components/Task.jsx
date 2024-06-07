@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import instance from "../apis/apisconfig";
 import toast from "react-hot-toast";
 import TaskDescription from "../modals/TaskDescriptionModal";
+import EditTask from "../modals/EditTask";
 
 export default function Task({ task, refreshTasks }) {
   const [showDescription, setShowDescription] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+
   const handleChangeStatus = () => {
     instance
       .put(`user/${task.user_id}/task/${task.id}/edit_status`, {
@@ -35,10 +38,10 @@ export default function Task({ task, refreshTasks }) {
       <p
         className={`cursor-pointer ${
           task.status === "todo"
-            ? "text-blue-700"
+            ? "text-blue-600"
             : task.status === "process"
-            ? "text-orange-400"
-            : "text-black"
+            ? "text-orange-600"
+            : ""
         }`}
         onClick={() => setShowDescription(true)}
       >
@@ -66,7 +69,7 @@ export default function Task({ task, refreshTasks }) {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
-          ß
+          onClick={() => setIsEdit(true)}
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
@@ -98,6 +101,13 @@ export default function Task({ task, refreshTasks }) {
         <TaskDescription
           task={task}
           onClose={() => setShowDescription(false)}
+        />
+      )}
+      {isEdit && (
+        <EditTask
+          task={task}
+          onClose={() => setIsEdit(false)}
+          refresh={refreshTasks}
         />
       )}
     </div>

@@ -7,6 +7,7 @@ import UserUpdate from "./pages/auths/UserUpdate";
 import Upcoming from "./pages/Upcoming";
 import TeamPage from "./pages/TeamPage";
 import UserChangePass from "./pages/auths/UserChangePass";
+import History from "./pages/History";
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -30,6 +31,10 @@ export default function useRouteElements() {
     {
       path: "/user/upcoming",
       element: <Upcoming />,
+    },
+    {
+      path: "/user/history",
+      element: <History />,
     },
     {
       path: "/teams/:teamId/:teamName",

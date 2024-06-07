@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Loginschema } from "../../utils/validate";
 import instance from "../../apis/apisconfig";
 import toast from "react-hot-toast";
+import bgDa5 from "../../assets/bgDa5.jpg";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,10 +13,12 @@ export default function Login() {
     email: "",
     password: "",
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -35,10 +38,28 @@ export default function Login() {
           console.log(response);
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      if (error.name === "ValidationError") {
+        const newErrors = {};
+        error.inner.forEach((err) => {
+          newErrors[err.path] = err.message;
+        });
+        console.log(newErrors);
+        setErrors(newErrors);
+      } else {
+        console.error("Đã có lỗi xảy ra:", error.message);
+      }
+    }
   };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cover bg-center ">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${bgDa5})`,
+      }}
+    >
       <div className="rounded bg-[#F6FBF9] bg-opacity-50 p-10 shadow-md">
         <div className="flex items-center justify-center">
           <h2 className="mb-4 text-2xl font-bold">Đăng nhập</h2>
@@ -59,6 +80,11 @@ export default function Login() {
               value={formData.email}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.email && (
+                <p className="text-red-500 text-xs italic">{errors.email}</p>
+              )}
+            </div>
           </div>
           <div className="mb-2">
             <label
@@ -75,6 +101,11 @@ export default function Login() {
               value={formData.password}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.password && (
+                <p className="text-red-500 text-xs italic">{errors.password}</p>
+              )}
+            </div>
           </div>
           <div className="flex items-center">
             <button

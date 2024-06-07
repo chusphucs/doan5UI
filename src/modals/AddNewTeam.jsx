@@ -22,7 +22,7 @@ const AddNewTeam = ({ userId, onClose, refreshTeams }) => {
         formData
       );
       if (response.status === 200) {
-        toast.success("Team created successfully!");
+        toast.success("Tạo nhóm mới thành công!");
         onClose();
         refreshTeams();
       }

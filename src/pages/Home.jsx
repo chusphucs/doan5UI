@@ -38,12 +38,12 @@ export default function Home() {
         <div className="md:grid md:col-span-4 grid col-span-5">
           <div className="flex flex-col">
             <div className="flex items-center px-12 pt-10 pb-1">
-              <h1 className="text-3xl font-bold mr-8">Today</h1>
+              <h1 className="text-3xl font-bold mr-8">Hôm nay</h1>
               <p className="">{currentDate}</p>
             </div>
             <div className="md:grid md:grid-cols-3 flex flex-col gap-10 p-4 md:pl-10 ">
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4 ">
-                <b className="mb-4 border-b-[1px] border-gray-300">To do</b>
+                <b className="mb-4 border-b-[1px] border-gray-300">Chuẩn bị</b>
                 {todoTask.map((task) => {
                   return (
                     <div key={task.id}>
@@ -51,11 +51,13 @@ export default function Home() {
                     </div>
                   );
                 })}
-                <button onClick={() => setAddTask(true)}>+ Add task</button>
+                <button onClick={() => setAddTask(true)}>
+                  + Thêm nhiệm vụ
+                </button>
               </div>
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
                 <b className="mb-4 border-b-[1px] border-gray-300">
-                  In Process
+                  Đang thực hiện
                 </b>
                 {processTask.map((task) => {
                   return (
@@ -66,7 +68,9 @@ export default function Home() {
                 })}
               </div>
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
-                <b className="mb-4 border-b-[1px] border-gray-300">Done</b>
+                <b className="mb-4 border-b-[1px] border-gray-300">
+                  Hoàn thành
+                </b>
                 {doneTask.map((task) => {
                   return (
                     <div key={task.id}>

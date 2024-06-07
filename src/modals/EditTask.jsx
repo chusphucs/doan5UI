@@ -1,20 +1,23 @@
-import React from "react";
-import { useState } from "react";
-import instance from "../apis/apisconfig";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
+import instance from "../apis/apisconfig";
 
-const AddTaskModal = ({ userId, teamId, onClose, refreshTasks }) => {
+const EditTask = ({ task, onClose, refresh }) => {
+  const userId = localStorage.getItem("userId");
+  console.log(task.id);
   const [formData, setFormData] = useState({
-    title: "",
-    day_start: "",
-    day_expire: "",
-    description: "",
-    status: "todo",
+    title: task.title,
+    day_start: task.day_start,
+    day_expire: task.day_expire,
+    description: task.description,
+    status: task.status,
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
   const formatDateTime = (dateTimeString) => {
     const dateTime = new Date(dateTimeString);
     const year = dateTime.getFullYear();
@@ -38,46 +41,49 @@ const AddTaskModal = ({ userId, teamId, onClose, refreshTasks }) => {
         : dateTime.getSeconds();
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
-  const handleSubmit = async (e) => {
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    let url = "";
-    if (teamId) {
-      url = `team/${teamId}/task/create`;
-    } else {
-      url = `user/${userId}/task/create`;
-    }
-    const formattedData = {
-      ...formData,
+    const updatedTask = {
+      title: formData.title,
+      description: formData.description,
       day_start: formatDateTime(formData.day_start),
       day_expire: formatDateTime(formData.day_expire),
-      user_id: userId,
+      status: formData.status,
     };
-    console.log(formattedData);
+
     try {
-      console.log(url);
-      const response = await instance.post(url, formattedData);
-      if (response.data.status_code === 200) {
-        toast.success("Tạo nhiệm vụ mới thành công!");
-        console.log(response);
+      const response = await instance.put(
+        `user/${userId}/task/${task.id}/edit`,
+        updatedTask
+      );
+      if (response.data.message === "Edit user task success") {
+        toast.success("Task updated successfully!");
         onClose();
-        refreshTasks();
-      } else if ((response.data.status_code = 422)) {
-        toast.error("Chức năng chỉ dành cho trường nhóm!");
+        refresh();
+      } else {
+        toast.error(response.data.message);
       }
     } catch (error) {
-      console.log("Error creating task:", error);
-      // Xử lí lỗi nếu có
+      console.error("Error updating task:", error);
+      toast.error("Failed to update task.");
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full">
+    <div
+      className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white p-8 rounded-md"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">Add Task</h2>
+          <h2 className="text-lg font-bold">Edit Task</h2>
           <button onClick={onClose}>Close</button>
         </div>
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
+        <form onSubmit={handleSave}>
           <div className="mb-4">
             <label
               htmlFor="title"
@@ -144,11 +150,30 @@ const AddTaskModal = ({ userId, teamId, onClose, refreshTasks }) => {
               placeholder="Enter task description"
             ></textarea>
           </div>
+          <div className="mb-4">
+            <label
+              htmlFor="status"
+              className="block text-gray-700 font-bold mb-2"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="todo">To Do</option>
+              <option value="process">In Process</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Create Task
+            Save Changes
           </button>
         </form>
       </div>
@@ -156,4 +181,4 @@ const AddTaskModal = ({ userId, teamId, onClose, refreshTasks }) => {
   );
 };
 
-export default AddTaskModal;
+export default EditTask;

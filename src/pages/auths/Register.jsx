@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { schema } from "../../utils/validate";
 import instance from "../../apis/apisconfig";
 import toast from "react-hot-toast";
+import bg from "../../assets/bgDa5.jpg";
+
 export default function Register() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
@@ -13,6 +15,7 @@ export default function Register() {
     password: "",
     confirm_password: "",
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -33,11 +36,26 @@ export default function Register() {
         console.log("->", response);
         navigate("/login");
       }
-    } catch (error) {}
+    } catch (error) {
+      if (error.name === "ValidationError") {
+        const newErrors = {};
+        error.inner.forEach((err) => {
+          newErrors[err.path] = err.message;
+        });
+        console.log(newErrors);
+        setErrors(newErrors);
+      } else {
+        console.error("Đã có lỗi xảy ra:", error.message);
+      }
+    }
   };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cover bg-center ">
-      <div className="rounded bg-[#F6FBF9] bg-opacity-50 p-10 shadow-md">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${bg})` }}
+    >
+      <div className="rounded bg-[#F6FBF9] bg-opacity-50 p-10 shadow-md w-[410px] h-[540px]">
         <div className="flex items-center justify-center">
           <h2 className="mb-4 text-2xl font-bold">Đăng ký</h2>
         </div>
@@ -47,7 +65,7 @@ export default function Register() {
               className="mb-2 block text-sm font-bold text-gray-700"
               htmlFor="name"
             >
-              Name
+              Tên
             </label>
             <input
               type="text"
@@ -57,6 +75,11 @@ export default function Register() {
               value={formData.name}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.name && (
+                <p className="text-red-500 text-xs italic">{errors.name}</p>
+              )}
+            </div>
           </div>
           <div className="mb-2">
             <label
@@ -73,6 +96,11 @@ export default function Register() {
               value={formData.email}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.email && (
+                <p className="text-red-500 text-xs italic">{errors.email}</p>
+              )}
+            </div>
           </div>
           <div className="mb-2">
             <label
@@ -89,11 +117,16 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.password && (
+                <p className="text-red-500 text-xs italic">{errors.password}</p>
+              )}
+            </div>
           </div>
           <div className="mb-2">
             <label
               className="mb-2 block text-sm font-bold text-gray-700"
-              htmlFor="password"
+              htmlFor="confirm_password"
             >
               Xác nhận mật khẩu
             </label>
@@ -105,6 +138,13 @@ export default function Register() {
               value={formData.confirm_password}
               onChange={handleChange}
             />
+            <div className="min-h-[20px]">
+              {errors.confirm_password && (
+                <p className="text-red-500 text-xs italic">
+                  {errors.confirm_password}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center">
             <button

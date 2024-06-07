@@ -6,8 +6,11 @@ import instance from "../apis/apisconfig";
 import { useState } from "react";
 import AddTaskModal from "../modals/AddTaskModal";
 import moment from "moment";
+import toast from "react-hot-toast";
+import EditTask from "../modals/EditTask";
 export default function Upcoming() {
   const User_id = localStorage.getItem("userId");
+  const [isEdit, setIsEdit] = useState(false);
 
   const currentDate = new Date().toISOString().slice(0, 10);
   const tomorrow = moment().add(1, "days").format("YYYY-MM-DD");
@@ -18,6 +21,7 @@ export default function Upcoming() {
   const [todoTask, setTodoTask] = useState([]);
   const [processTask, setProcessTask] = useState([]);
   const [doneTask, setDoneTask] = useState([]);
+
   const getData = () => {
     instance
       .get(`user/${User_id}/task/upcomming`)
@@ -35,8 +39,23 @@ export default function Upcoming() {
       })
       .catch((err) => console.log(err));
   };
+  const handleDeleteTask = () => {
+    console.log(selectedTask);
+    instance
+      .delete(`user/${selectedTask.user_id}/task/${selectedTask.id}/delete`)
+      .then((res) => {
+        if (res.status === 200) {
+          getData();
+          setSelectedTask(null);
+          toast.success("Xóa thành công!");
+        } else {
+          toast.error(res.message);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
   const handleTaskClick = (task) => {
-    setSelectedTask(task); // Cập nhật state với task đã click
+    setSelectedTask(task);
   };
   useEffect(() => {
     getData();
@@ -49,12 +68,12 @@ export default function Upcoming() {
         <div className="md:grid md:col-span-4 grid col-span-5">
           <div className="flex flex-col">
             <div className="flex items-center px-12 pt-10 pb-1">
-              <h1 className="text-3xl font-bold mr-8 ">Today</h1>
+              <h1 className="text-3xl font-bold mr-8 ">Hôm nay</h1>
               <p className="">{currentDate}</p>
             </div>
             <div className="md:grid md:grid-cols-3 flex flex-col gap-10 p-4 md:pl-10 ">
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4 ">
-                <b className="mb-4 border-b-[1px] border-gray-300">To do</b>
+                <b className="mb-4 border-b-[1px] border-gray-300">Chuẩn bị</b>
                 {todoTask.map((task) => {
                   return (
                     <div key={task.id}>
@@ -62,11 +81,13 @@ export default function Upcoming() {
                     </div>
                   );
                 })}
-                <button onClick={() => setAddTask(true)}>+ Add task</button>
+                <button onClick={() => setAddTask(true)}>
+                  + Thêm nhiệm vụ{" "}
+                </button>
               </div>
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
                 <b className="mb-4 border-b-[1px] border-gray-300">
-                  In Process
+                  Đang thực hiện
                 </b>
                 {processTask.map((task) => {
                   return (
@@ -77,7 +98,9 @@ export default function Upcoming() {
                 })}
               </div>
               <div className="col-span-1 flex flex-col  border-[1px] border-gray-300 shadow-lg p-4">
-                <b className="mb-4 border-b-[1px] border-gray-300">Done</b>
+                <b className="mb-4 border-b-[1px] border-gray-300">
+                  Hoàn thành
+                </b>
                 {doneTask.map((task) => {
                   return (
                     <div key={task.id}>
@@ -90,7 +113,7 @@ export default function Upcoming() {
           </div>
           <div className="flex flex-col">
             <div className="flex items-center px-12 pb-1">
-              <h1 className="text-3xl font-bold mr-8">Tomorrow</h1>
+              <h1 className="text-3xl font-bold mr-8">Ngày mai</h1>
               <p className="">{tomorrow}</p>
             </div>
 
@@ -105,13 +128,10 @@ export default function Upcoming() {
                         onClick={() => handleTaskClick(task)}
                       >
                         <div className="flex justify-start">
-                          <p className=" text-gray-400 mr-4 w-20 overflow-hidden">
+                          <p className=" text-gray-400 mr-4 w-40 overflow-hidden">
                             {task.title}
                           </p>
                           <p>{task.description}</p>
-                        </div>
-                        <div className="flex items-center justify-center gap-4">
-                          <p>delete</p> <p>edit</p>
                         </div>
                       </div>
                     );
@@ -120,7 +140,7 @@ export default function Upcoming() {
                     className="p-4 md:pl-10 text-blue-400"
                     onClick={() => setAddTask(true)}
                   >
-                    -> Add a task for tomorrow
+                    -> Thêm nhiệm vụ cho ngày mai
                   </button>
                 </div>
               </div>
@@ -129,18 +149,20 @@ export default function Upcoming() {
                   <div className="flex justify-between gap-10 items-center mb-4">
                     <h2 className="text-lg font-bold">{selectedTask?.title}</h2>
                   </div>
-                  <p className="text-gray-400 text-xs mb-1">Description:</p>
+                  <p className="text-gray-400 text-xs mb-1">Chi tiết:</p>
                   <p className="text-gray-700 pl-2 w-[250px] md:w-[400px] h-20">
                     {selectedTask?.description}
                   </p>
-                  <p className="text-gray-400 text-xs mb-1">Start Date</p>
+                  <p className="text-gray-400 text-xs mb-1">Ngày bắt đầu</p>
                   <p className="text-gray-500 text-sm pl-2">
                     {selectedTask &&
                       new Date(selectedTask?.day_start)
                         .toISOString()
                         .split("T")[0]}
                   </p>
-                  <p className="text-gray-400 text-xs mb-1">Start Time</p>
+                  <p className="text-gray-400 text-xs mb-1">
+                    Thời gian bắt đầu
+                  </p>
                   <div className="flex justify-start gap-2 pl-2">
                     <p className="text-sm text-gray-500">
                       {selectedTask &&
@@ -158,6 +180,23 @@ export default function Upcoming() {
                           .slice(0, 5)}
                     </p>
                   </div>
+                  <div className="flex items-center pt-6 gap-4">
+                    <button
+                      className="px-2 py-1 text-sm rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      onClick={handleDeleteTask}
+                      aria-label="Delete Task"
+                    >
+                      Xóa
+                    </button>
+
+                    <button
+                      className="px-2 py-1 text-sm rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={() => setIsEdit(true)}
+                      aria-label="Edit Task"
+                    >
+                      Chỉnh sửa
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,6 +208,13 @@ export default function Upcoming() {
           userId={User_id}
           onClose={() => setAddTask(false)}
           refreshTasks={getData}
+        />
+      )}
+      {isEdit && (
+        <EditTask
+          task={selectedTask}
+          onClose={() => setIsEdit(false)}
+          refresh={getData}
         />
       )}
     </MainLayout>
